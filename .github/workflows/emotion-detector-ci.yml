@@ -1,0 +1,28 @@
+name: Emotion Detector CI
+
+on:
+  push:
+    paths:
+      - 'emotion-detector-final-project/**'
+      - '.github/workflows/emotion-detector-ci.yml'
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: emotion-detector-final-project
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Install dependencies
+        run: pip install flask requests pylint
+      - name: Package import test
+        run: python -c "from EmotionDetection import emotion_detector; print('EmotionDetection package imported successfully:', callable(emotion_detector))"
+      - name: Unit tests
+        run: python -m unittest -v test_emotion_detection.py
+      - name: Static analysis
+        run: pylint server.py EmotionDetection/emotion_detection.py EmotionDetection/__init__.py test_emotion_detection.py
